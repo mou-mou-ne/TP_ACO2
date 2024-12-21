@@ -8,15 +8,30 @@ import Command.Pastinator;
 
 import javax.swing.JTextArea;
 
+/**
+ * Unit tests for the Pastinator class.
+ * 
+ * <p>This class tests the functionality of the Pastinator class, which is responsible for pasting text from the clipboard into a JTextArea at the current caret position.</p>
+ * 
+ * <p>The following scenarios are tested:</p>
+ * <ul>
+ *   <li>Inserting text at the beginning of the text area.</li>
+ *   <li>Inserting text at a specific caret position within the text area.</li>
+ *   <li>Handling empty clipboard content without altering the existing text in the text area.</li>
+ *   <li>Ensuring the caret is moved after pasting.</li>
+ *   <li>Inserting at the end of an empty text area.</li>
+ *   <li>Handling long text in the clipboard.</li>
+ * </ul>
+ * 
+ * @see Pastinator
+ * @see JTextArea
+ */
 public class PastinatorTest {
 
     private JTextArea textArea;
     private String clipboardContent;
     private Pastinator pastinator;
 
-    /**
-     * Set up the test environment by initializing a {@link JTextArea} and the {@link Pastinator} object.
-     */
     @Before
     public void setUp() {
         textArea = new JTextArea();
@@ -24,61 +39,57 @@ public class PastinatorTest {
         pastinator = new Pastinator(textArea, clipboardContent);
     }
 
-    /**
-     * Test the execute method of the Pastinator class.
-     * This test ensures that the text is inserted at the current caret position.
-     */
     @Test
     public void testExecute() {
-        // Set the caret position at the beginning of the text area
         textArea.setCaretPosition(0);
-
-        // Execute the paste command
         pastinator.execute();
-
-        // Check if the text was correctly inserted at the caret position
         assertEquals("Hello, World!", textArea.getText());
     }
 
-    /**
-     * Test the execute method when the caret position is not at the start.
-     * This checks that the text is inserted correctly at any caret position.
-     */
     @Test
     public void testExecuteAtDifferentCaretPosition() {
-        // Set initial content in the text area
         textArea.setText("This is a test. ");
-        
-        // Set the caret position after the initial text
         textArea.setCaretPosition(16);
-
-        // Execute the paste command
         pastinator.execute();
-
-        // Check if the text was correctly inserted at the new caret position
         assertEquals("This is a test. Hello, World!", textArea.getText());
     }
 
-    /**
-     * Test the execute method when the clipboard content is empty.
-     * This ensures that no text is inserted if the clipboard content is empty.
-     */
     @Test
     public void testExecuteWithEmptyClipboard() {
-        // Set the clipboard content to an empty string
         clipboardContent = "";
         pastinator = new Pastinator(textArea, clipboardContent);
-
-        // Set initial content in the text area
         textArea.setText("Existing content. ");
-
-        // Set the caret position at the end of the text area
         textArea.setCaretPosition(18);
-
-        // Execute the paste command
         pastinator.execute();
-
-        // Check if the text was not changed
         assertEquals("Existing content. ", textArea.getText());
+    }
+
+
+    // Test d'insertion de texte à la fin du JTextArea (sans contenu initial)
+    @Test
+    public void testInsertAtEnd() {
+        textArea.setCaretPosition(0); // Placé au début
+        textArea.setText("");
+        pastinator.execute();
+        assertEquals("Hello, World!", textArea.getText());
+    }
+
+    // Test avec un texte long dans le presse-papiers
+    @Test
+    public void testLongClipboardContent() {
+        String longText = "A".repeat(10000); // Génère un texte très long
+        clipboardContent = longText;
+        pastinator = new Pastinator(textArea, clipboardContent);
+        textArea.setCaretPosition(0);
+        pastinator.execute();
+        assertEquals(longText, textArea.getText());
+    }
+
+    // Test avec un JTextArea vide au départ
+    @Test
+    public void testEmptyTextArea() {
+        textArea.setText("");
+        pastinator.execute();
+        assertEquals("Hello, World!", textArea.getText());
     }
 }

@@ -8,7 +8,9 @@ import engine.Engine_implementation;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the Engine_implementation class.
+ * Unit tests for the Engine_implementation class.
+ * 
+ * This class contains various test cases to verify the functionality of the Engine_implementation class.
  */
 public class EngineImplementationTest {
 
@@ -67,7 +69,7 @@ public class EngineImplementationTest {
     public void testPasteClipboard() {
         engine.copySelectedText(0, 4); // Copie "This"
         engine.pasteClipboard(10); // Colle à la position 10
-        assertEquals("This is a simple test buffer.This", engine.getBufferContents(),
+        assertEquals("This is a Thissimple test buffer.", engine.getBufferContents(),
             "The buffer should include the pasted text.");
     }
 
@@ -119,5 +121,63 @@ public class EngineImplementationTest {
         engine.pasteClipboard(10); // Essayez de coller un presse-papiers vide
         assertEquals("This is a simple test buffer.", engine.getBufferContents(), 
             "The buffer should not change when the clipboard is empty.");
+    }
+
+    /**
+     * Test to verify copy with reversed indices (start > end).
+     */
+    @Test
+    public void testCopySelectedTextReversedIndices() {
+        assertThrows(StringIndexOutOfBoundsException.class, 
+            () -> engine.copySelectedText(4, 0), 
+            "Copy operation should throw an exception for reversed indices.");
+    }
+
+    /**
+     * Test to verify cut with reversed indices (start > end).
+     */
+    @Test
+    public void testCutSelectedTextReversedIndices() {
+        assertThrows(StringIndexOutOfBoundsException.class, 
+            () -> engine.cutSelectedText(4, 0), 
+            "Cut operation should throw an exception for reversed indices.");
+    }
+
+    /**
+     * Test to verify paste with out-of-bounds position.
+     */
+    @Test
+    public void testPasteClipboardOutOfBounds() {
+        engine.setClipboardContents("Test");
+        assertThrows(StringIndexOutOfBoundsException.class, 
+            () -> engine.pasteClipboard(50), 
+            "Paste operation should throw an exception for out-of-bounds indices.");
+    }
+
+    /**
+     * Test clipboard content after cut operation.
+     */
+    @Test
+    public void testClipboardAfterCut() {
+        engine.cutSelectedText(0, 4); // Coupe "This"
+        assertEquals("This", engine.getClipboardContents(), "Clipboard should contain the cut text.");
+    }
+
+    /**
+     * Test setting the buffer contents to null.
+     */
+    @Test
+    public void testSetBufferContentsNull() {
+        engine.setBufferContents(null);
+        assertEquals("This is a simple test buffer.", engine.getBufferContents(), "Buffer should not change with null input.");
+    }
+
+    /**
+     * Test setting the buffer contents to an empty string.
+     */
+    @Test
+    public void testSetBufferContentsEmpty() {
+        engine.setBufferContents("");
+        assertEquals("", engine.getBufferContents(), "Buffer should be empty when set to an empty string.");
     }
 }

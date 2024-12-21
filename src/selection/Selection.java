@@ -3,7 +3,7 @@ package selection;
 /**
  * Provides access to selection control operations
  *
- * @author 
+ * @author doofenshmirtz
  * @version 1.0
  */
 public interface Selection {

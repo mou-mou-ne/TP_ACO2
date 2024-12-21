@@ -8,16 +8,7 @@ import selection.Selection_implement;
  * from a {@link JTextArea} and storing it in the clipboard.
  * This command is typically used to remove selected text from a text area and save it to the clipboard for potential pasting.
  * 
- * <p>This class is part of the Command pattern, encapsulating the cut action as an object that can be executed
- * when needed. The cut operation involves selecting text, removing it from the text area, and storing it in the clipboard.</p>
- * 
- * <p>Usage:</p>
- * <pre>
- * JTextArea textArea = new JTextArea();
- * Selection_implement selection = new Selection_implement(textArea.getText());
- * Cutinator cutinator = new Cutinator(textArea, selection);
- * cutinator.execute();
- * </pre>
+
  */
 public class Cutinator implements Command_interface {
 
@@ -25,8 +16,7 @@ public class Cutinator implements Command_interface {
     private Selection_implement selection;
 
     /**
-     * Constructs a new Cutinator with the specified {@link JTextArea} and {@link Selection_implement} object.
-     * 
+     * Constructs a new Cutinator with the specified text area and selection object.
      * @param textArea the {@link JTextArea} from which the selected text will be cut
      * @param selection the {@link Selection_implement} object used to manage the clipboard
      */
@@ -36,9 +26,6 @@ public class Cutinator implements Command_interface {
     }
 
     /**
-     * Executes the cut command by removing the selected text from the {@link JTextArea}
-     * and saving it to the clipboard.
-     * 
      * <p>This method retrieves the selection start and end positions from the {@link JTextArea},
      * validates the selection, removes the selected text, and then stores the removed text in the clipboard.</p>
      * 

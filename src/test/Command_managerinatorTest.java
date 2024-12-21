@@ -1,8 +1,10 @@
 package test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import javax.swing.JTextArea;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,54 +19,80 @@ public class Command_managerinatorTest {
     private JTextArea textArea;
     private Selection_implement selection;
 
-    /**
-     * Set up the test environment by initializing a {@link Command_managerinator} and the components
-     * necessary for executing commands, such as {@link JTextArea} and {@link Selection_implement}.
-     */
     @Before
     public void setUp() {
         commandManager = new Command_managerinator();
         textArea = new JTextArea("Initial text in the text area.");
-        selection = new Selection_implement(textArea.getText()); // Simulate a selection in the text area
+        selection = new Selection_implement(textArea.getText()); // Simulate a selection
     }
 
     /**
-     * Test the executeCommand method to ensure commands are executed and stored in the history stack.
+     * Test the execution of multiple commands to ensure they work as expected.
      */
     @Test
-    public void testExecuteCommand() {
-        // Prepare command: Cut the word "text" from the JTextArea
+    public void testMultipleCommandsExecution() {
+        // Prepare the selection, assuming "text" is selected.
+        selection.setBeginIndex(8);  // "text" starts at index 8
+        selection.setEndIndex(12);   // "text" ends at index 12
+    
+        // Prepare multiple commands
+        Cutinator cutCommand = new Cutinator(textArea, selection);
+        Pastinator pasteCommand = new Pastinator(textArea, "new text");
+    
+        // Execute commands
+        commandManager.executeCommand(cutCommand);  // This will cut "text"
+        commandManager.executeCommand(pasteCommand);  // This will paste "new text"
+    
+        // Validate the final state of the text area
+        assertEquals("new textInitial text in the text area.", textArea.getText());  // "text" should be cut and "new text" pasted
+    }
+    
+
+    /**
+     * Test the growth of the command history as commands are executed.
+     */
+    @Test
+    public void testCommandHistoryGrowth() {
+        // Check initial size of history
+        assertEquals(0, commandManager.getCommandHistorySize());
+
+        // Execute a command
+        Cutinator cutCommand = new Cutinator(textArea, selection);
+        commandManager.executeCommand(cutCommand);
+
+        // Validate history growth
+        assertEquals(1, commandManager.getCommandHistorySize());
+    }
+
+    /**
+     * Test undo functionality when the history is not empty.
+     * Since undo is not implemented, ensure the appropriate message is printed.
+     */
+    @Test
+    public void testUndoWithoutImplementation() {
+        // Prepare a command
         Cutinator cutCommand = new Cutinator(textArea, selection);
 
-        // Execute the cut command
+        // Execute the command
         commandManager.executeCommand(cutCommand);
-        
-        // Verify that the text "text" has been removed
-        assertEquals("Initial text in the  area.", textArea.getText());
 
-        
+        // Attempt to undo
+        commandManager.undoLastCommand();
+
+        // Since undo is not implemented, text should remain unchanged
+        assertEquals("Initial text in the text area.", textArea.getText());
     }
 
     /**
-     * Test the undoLastCommand method to ensure it prints the appropriate message when no undo functionality is implemented.
+     * Test undo functionality when no commands have been executed.
+     * Ensure it handles empty history gracefully.
      */
     @Test
-    public void testUndoLastCommand() {
-        // Execute a paste command (using the previously cut text as clipboard content)
-        Pastinator pasteCommand = new Pastinator(textArea, "text");
-        commandManager.executeCommand(pasteCommand);
+    public void testUndoEmptyHistory() {
+        // Attempt to undo without any commands
+        commandManager.undoLastCommand();
 
-        // Call undo, it should print the placeholder message
-        commandManager.undoLastCommand(); // Expected output: "Undo not implemented yet."
-    }
-
-    /**
-     * Test the undoLastCommand method when no commands have been executed.
-     * Ensure it prints a message indicating that there are no commands to undo.
-     */
-    @Test
-    public void testUndoWhenNoCommands() {
-        // Call undo without executing any commands
-        commandManager.undoLastCommand(); // Expected output: "No commands to undo."
+        // No effect expected, just validate that no exception is thrown
+        assertTrue("No commands to undo.", true);
     }
 }

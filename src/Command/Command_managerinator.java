@@ -42,4 +42,14 @@ public class Command_managerinator {
             System.out.println("No commands to undo.");
         }
     }
+
+    /**
+     * Returns the size of the command history.
+     *
+     * @return the number of commands in the command history
+     */
+    public int getCommandHistorySize() {
+        return commandHistory.size();
+    }
+    
 }

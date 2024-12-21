@@ -9,6 +9,19 @@ import Command.Cutinator;
 import javax.swing.JTextArea;
 import selection.Selection_implement;
 
+/**
+ * Unit tests for the Cutinator class.
+ * This class tests the functionality of the Cutinator class, which is responsible for cutting text from a JTextArea and storing it in a clipboard.
+ * 
+ * <p>Test cases are (might add some later):</p>
+ * <ul>
+ *   <li>Testing the execute method with a valid selection.</li>
+ *   <li>Testing the execute method when there is no valid selection.</li>
+ *   <li>Testing the execute method with an invalid selection.</li>
+ *   <li>Testing the execute method with an empty selection.</li>
+ * </ul>
+ * 
+ */
 public class CutinatorTest {
 
     private JTextArea textArea;
@@ -16,7 +29,7 @@ public class CutinatorTest {
     private Cutinator cutinator;
 
     /**
-     * Set up the test environment by initializing a {@link JTextArea}, {@link Selection_implement}, and the {@link Cutinator} object.
+     * Set up the test environment by initializing the JTextArea, Selection_implement, and Cutinator objects.
      */
     @Before
     public void setUp() {
@@ -35,17 +48,17 @@ public class CutinatorTest {
         textArea.setText("This is some text to cut.");
 
         // Select a portion of the text
-        textArea.setSelectionStart(10);
-        textArea.setSelectionEnd(14);
+        textArea.setSelectionStart(12);
+        textArea.setSelectionEnd(17);
 
         // Execute the cut command
         cutinator.execute();
 
         // Check if the selected text is removed from the text area
-        assertEquals("This is some  to cut.", textArea.getText());
+        assertEquals("This is some to cut.", textArea.getText());
 
         // Check if the selected text was stored in the clipboard
-        assertEquals("text", selection.getClipboard());
+        assertEquals(" text", selection.getClipboard());
     }
 
     /**
@@ -67,7 +80,7 @@ public class CutinatorTest {
         assertEquals("This is some text.", textArea.getText());
 
         // Check that the clipboard is empty since no text was selected
-        assertEquals("", selection.getClipboard());
+        assertEquals(null, selection.getClipboard());
     }
 
     /**
@@ -107,6 +120,6 @@ public class CutinatorTest {
         assertEquals("Some text to cut.", textArea.getText());
 
         // Check that the clipboard is still empty
-        assertEquals("", selection.getClipboard());
+        assertEquals(null, selection.getClipboard());
     }
 }

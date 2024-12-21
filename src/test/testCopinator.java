@@ -8,6 +8,18 @@ import selection.Selection_implement;
 import javax.swing.JTextArea;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test class for the Copinator class.
+ * 
+ * This class contains unit tests for the Copinator class, which is responsible for copying
+ * selected text from a JTextArea to an Engine_implementation's clipboard.
+ * 
+ * The tests cover the following scenarios:
+ * - Valid selection: Ensures that the selected text is correctly copied to the clipboard.
+ * - No selection: Ensures that nothing is copied when the selection end is before the start.
+ * - Empty selection: Ensures that nothing is copied when no selection is made.
+
+ */
 class testCopinator {
 
     private Engine_implementation engine;

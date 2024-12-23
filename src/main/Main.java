@@ -1,51 +1,151 @@
-/**
- * Package Main
- * @author Salma BOUCHRA 
- */
 package main;
 
-import Command.Command_managerinator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import Command.Copinator;
+import Command.Cutinator;
+import Command.Deletinator;
+import Command.Insertinator;
+import Command.Pastinator;
+import Command.Replay;
+import Command.Select;
+import Command.Undo;
+import Invoker.Invoker;
+import Recorder.recorderImpl;
 import engine.Engine_implementation;
-import selection.Selection;
-import selection.Selection_implement;
-import userinterface.User_interfacinator;
+import undoManagerinator.UndoManagerinatorImpl;
 
-/**
- * Classe main
- * 
- * <p>
- * This is a text editor, probably the best one you have ever seen if you are blind
- * Here is a list of the different classes
- * <ul>
- *   <li>the engine {@link engine.Engine_implementation}</li>
- *   <li>the selection {@link selection.Selection_implement}</li>
- *   <li>the command managerinator * a lire avec la voix de Doofernshmitz* {@link Command.Command_managerinator}</li>
- *   <li>the user interface {@link userinterface.User_interfacinator}</li>
- * </ul>
- * </p>
- */
 public class Main {
 
-    /**
-     * 
-     * 
-     * <p>
-     * The laucher of the best text editor
-     * </p>
-     *
-     * @param args I'm not sure what is this param but without it, the code doesn't work
-     */
+    public static void display(Engine_implementation engine, Invoker invoker, boolean isRecording) {
+        System.out.println();
+        System.out.println("Buffer : " + engine.getBufferContents());
+        System.out.println("Begin Index : " + engine.getSelection().getBeginIndex());
+        System.out.println("End Index : " + engine.getSelection().getEndIndex());
+        System.out.println("Clipboard: " + engine.getClipboardContents());
+        if (isRecording) {
+            System.out.println("Enregistrement en cours...");
+        }
+    }
+
     public static void main(String[] args) {
-        // Contenu initial du buffer
-        String initialContent = "Ceci est un exemple de contenu dans le buffer. Sélectionnez du texte pour interagir.";
+        Engine_implementation engine = new Engine_implementation();
+        recorderImpl recorder = new recorderImpl();
+        UndoManagerinatorImpl undoManager = new UndoManagerinatorImpl(engine);
+        Invoker invoker = new Invoker();
+        
+        // Utilisation d'un tableau pour isRecording afin de le rendre mutable
+        final boolean[] isRecording = {false};
+        // Utilisation d'un tableau pour running afin de le rendre mutable
+        final boolean[] running = {true};
 
-        // Créer les instances des classes principales
-        Engine_implementation engine = new Engine_implementation(initialContent);
-        Selection selection = new Selection_implement(initialContent);
-        Command_managerinator commandManager = new Command_managerinator();
+        // Scanner pour les entrées utilisateur
+        Scanner scanner = new Scanner(System.in);
 
-        // Créer et lancer l'interface utilisateur
-        User_interfacinator ui = new User_interfacinator(engine, selection, commandManager);
-        ui.launchUI();
+        // Création d'une Map pour associer les options aux actions
+        Map<Integer, Runnable> actions = new HashMap<>();
+        
+        // Remplissage de la Map avec les différentes options
+        actions.put(1, () -> {
+            System.out.print("Entrez le texte à insérer : ");
+            String text = scanner.nextLine();
+            invoker.setTextToInsert(text);
+            Insertinator insertCommand = new Insertinator(engine, invoker, recorder, undoManager);
+            invoker.addCommand("insert", insertCommand);
+            invoker.playCommand("insert");
+            System.out.println("Inserted ");
+        });
+
+        actions.put(2, () -> {
+            System.out.print("Input Index start : ");
+            int beginIndex = scanner.nextInt();
+            System.out.print("Input index end : ");
+            int endIndex = scanner.nextInt();
+            invoker.setBeg(beginIndex);
+            invoker.setEnd(endIndex);
+            Select select = new Select(engine, invoker, recorder, undoManager);
+            invoker.addCommand("select", select);
+            invoker.playCommand("select");
+            System.out.println("Selected");
+        });
+
+        actions.put(3, () -> {
+            Copinator copy = new Copinator(engine, recorder, undoManager);
+            invoker.addCommand("copy", copy);
+            invoker.playCommand("copy");
+            System.out.println("Paste in clipboard");
+        });
+
+        actions.put(4, () -> {
+            Cutinator cut = new Cutinator(engine, recorder, undoManager);
+            invoker.addCommand("cut", cut);
+            invoker.playCommand("cut");
+            System.out.println("Text cut");
+        });
+
+        actions.put(5, () -> {
+            Pastinator past = new Pastinator(engine, recorder, undoManager);
+            invoker.addCommand("paste", past);
+            invoker.playCommand("paste");
+            System.out.println("Succesfully glued");
+        });
+
+        actions.put(6, () -> {
+            Deletinator delete = new Deletinator(engine, recorder, undoManager);
+            invoker.addCommand("delete", delete);
+            invoker.playCommand("delete");
+            System.out.println("Txt deleted.");
+        });
+
+        actions.put(7, () -> {
+            Replay replay = new Replay(recorder);
+            invoker.addCommand("replay", replay);
+            invoker.playCommand("replay");
+        });
+
+        actions.put(8, () -> {
+            Undo undo = new Undo(undoManager);
+            invoker.addCommand("undo", undo);
+            invoker.playCommand("undo");
+        });
+
+        actions.put(9, () -> {
+            invoker.playCommand("redo");
+        });
+
+        actions.put(42, () -> {
+            running[0] = false; // Modification de la valeur de running
+            System.out.println("Closing, thanks for using it");
+        });
+
+        while (running[0]) {
+            System.out.println("\n--- Commands ---");
+            System.out.println("1. Insert text");
+            System.out.println("2. Select");
+            System.out.println("3. Copy");
+            System.out.println("4. Cut");
+            System.out.println("5. Past");
+            System.out.println("6. Delete");
+            System.out.println("7. Replay");
+            System.out.println("8. Undo");
+            System.out.println("9. Redo");
+            System.out.println("42. Exit");
+            System.out.print("What do you want to do  : ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();  // Consume the newline
+
+            // Exécute l'action associée à l'option choisie
+            if (actions.containsKey(choice)) {
+                actions.get(choice).run();
+            } else {
+                System.out.println("Not possible, try again");
+            }
+
+            display(engine, invoker, isRecording[0]);
+        }
+
+        scanner.close();
     }
 }

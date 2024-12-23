@@ -57,20 +57,7 @@ public interface Selection {
     void setEndIndex(int endIndex);
 
     
-    // Tout ce qu'est en dessous je l'ai ajouter parce que Eclipse me le demandait quand je codait ma clasee Engine_implmentation
-	
-    /**
-     *  
-     * @return  the text in the buffer
-     */
-    String getSelectedText();
-    
-    /**
-     * 
-     * @param clipboard
-     * remplace la selection par ce qui est copier dans le clipboard
-     */
-	void replaceSelection(String clipboard);
+   
 
 
 }

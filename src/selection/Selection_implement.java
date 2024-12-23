@@ -1,32 +1,27 @@
 package selection;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-
 /**
  * Implementation of the Selection interface, 
  */
 public class Selection_implement implements Selection {
 
-    private int beginIndex; // Starting index of the selection.
-    private int endIndex;   // Ending index of the selection.
-    private int bufferBeginIndex; // Starting index of the buffer.
-    private int bufferEndIndex;   // Ending index of the buffer.
-    private final StringBuilder buffer; // Text buffer for managing content.
-    private String clipboard; // Internal clipboard to store copied text.
+    private int beginIndex; 
+    private int endIndex;  
+    private int bufferBeginIndex;
+    private int bufferEndIndex;   
+    private final StringBuilder buffer; 
 
     /**
      * Constructs a Selection_implement 
      *
      * @param initialContent the initial content (like the name indique)
      */
-    public Selection_implement(String initialContent) {
+    public Selection_implement(StringBuilder buffer) {
         this.beginIndex = 0;
         this.endIndex = 0;
         this.bufferBeginIndex = 0;
         this.bufferEndIndex = 0;
-        this.buffer = new StringBuilder(initialContent);
+        this.buffer = buffer;
     }
 
     /**
@@ -77,7 +72,10 @@ public class Selection_implement implements Selection {
      */
     public void setBeginIndex(int beginIndex) {
         if (beginIndex < 0 || beginIndex > buffer.length()) {
+            System.out.println("taille" + buffer.length());
+            System.out.println("max" + beginIndex);
             throw new IllegalArgumentException("Begin index out of bounds");
+
         }
         this.beginIndex = beginIndex;
     }
@@ -88,62 +86,11 @@ public class Selection_implement implements Selection {
      * @param endIndex the ending index of the selection
      */
     public void setEndIndex(int endIndex) {
-        if (endIndex > buffer.length()) {
-            endIndex = buffer.length(); // Adjusts the index to fit buffer size
+    	if (endIndex < 0 ) {
+            throw new IllegalArgumentException("Begin index out of bounds");
         }
         this.endIndex = endIndex;
     }
 
-    /**
-     * Gets the text currently selected in the buffer.
-     *
-     * @return the selected text
-     */
-    public String getSelectedText() {
-        return buffer.substring(beginIndex, endIndex);
-    }
-
-    /**
-     * Replaces the selected text in the buffer with the given replacement.
-     *
-     * @param replacement the text to replace the selection
-     */
-    public void replaceSelection(String replacement) {
-        if (replacement != null) {
-            buffer.replace(beginIndex, endIndex, replacement);
-            this.endIndex = this.beginIndex + replacement.length();
-        }
-    }
-
-    /**
-     * Gets the entire content of the buffer.
-     *
-     * @return the buffer content as a string
-     */
-    public String getBufferContent() {
-        return buffer.toString();
-    }
-
-    /**
-     * Sets the given text to the clipboard and updates the system clipboard.
-     *
-     * @param text the text to copy to the clipboard
-     */
-    public void setClipboard(String text) {
-        this.clipboard = text; // Updates the internal clipboard
-
-        // Updates the system clipboard
-        StringSelection selection = new StringSelection(text);
-        Clipboard clipboardSystem = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboardSystem.setContents(selection, null);
-    }
-
-    /**
-     * Gets the content currently stored in the internal clipboard.
-     *
-     * @return the clipboard content
-     */
-    public String getClipboard() {
-        return clipboard;
-    }
+    
 }

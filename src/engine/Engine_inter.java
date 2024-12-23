@@ -1,5 +1,6 @@
 package engine;
 
+import mementomoris.Memento;
 import selection.Selection;
 
 /**
@@ -57,4 +58,38 @@ public interface Engine_inter {
 	     * Removes the contents of the selection in the buffer
 	     */
 	    void delete();
+	    
+	    /**
+	     * Définit le contenu du tampon avec une nouvelle valeur.
+	     * Cette méthode permet de remplacer le texte actuel du tampon par un texte donné.
+	     * 
+	     * @param s le nouveau contenu du tampon sous forme de StringBuilder
+	     */
+	    void setBufferContent(StringBuilder s);
+
+	    /**
+	     * Définit le contenu du presse-papiers avec un nouveau texte.
+	     * Cette méthode remplace le contenu actuel du presse-papiers.
+	     * 
+	     * @param s le texte à mettre dans le presse-papiers
+	     */
+	    void setClipboardContent(String s);
+
+	    /**
+	     * Fournit un Memento représentant l'état actuel de l'éditeur.
+	     * Cela permet de sauvegarder l'état actuel du moteur (par exemple, le contenu du tampon, 
+	     * la sélection, le presse-papiers) pour pouvoir revenir à cet état plus tard (par exemple, lors d'une opération d'annulation).
+	     * 
+	     * @return le Memento représentant l'état actuel
+	     */
+	    Memento getMemento();
+
+	    /**
+	     * Définit l'état actuel du moteur d'édition à partir d'un Memento.
+	     * Cela permet de restaurer un état précédemment sauvegardé, par exemple, lors d'une opération de réinitialisation ou d'annulation.
+	     * 
+	     * @param m le Memento à restaurer
+	     */
+	    void setMemento(Memento m);
+	
 	}

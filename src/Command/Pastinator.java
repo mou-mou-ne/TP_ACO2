@@ -2,16 +2,22 @@ package Command;
 
 import javax.swing.JTextArea;
 
+import Recorder.recorderImpl;
+import engine.Engine_implementation;
+import mementomoris.Memento;
+import undoManagerinator.UndoManagerinatorImpl;
+
+
 /**
  * The Pastinator class implements the Command_interface and defines the action of pasting text
  * into a {@link JTextArea} at the current caret position.
  * This command is typically used to insert clipboard content into a text area.
-
  */
-public class Pastinator implements Command_interface {
+public class Pastinator implements CommandOriginator {
+    private Engine_implementation engine;
+    private recorderImpl recorder;
+    private UndoManagerinatorImpl undo;
 
-    private JTextArea textArea;
-    private String clipboardContent;
 
     /**
      * Constructs a new Pastinator with the specified {@link JTextArea} and clipboard content.
@@ -19,20 +25,41 @@ public class Pastinator implements Command_interface {
      * @param textArea the {@link JTextArea} in which the text will be pasted
      * @param clipboardContent the content to be pasted into the text area
      */
-    public Pastinator(JTextArea textArea, String clipboardContent) {
-        this.textArea = textArea;
-        this.clipboardContent = clipboardContent;
+    public Pastinator(Engine_implementation engine,recorderImpl recorder,UndoManagerinatorImpl undo ) {
+     this.engine = engine;
+     this.recorder = recorder;
+     this.undo = undo;
+
     }
 
     /**
      * Executes the paste command by inserting the clipboard content at the current caret position
      * in the {@link JTextArea}.
-
      */
     @Override
     public void execute() {
-        int caretPosition = textArea.getCaretPosition(); // Retrieve the caret (fancy word to speak about the blinking cursor quand vous allez écrire ) position
-        textArea.insert(clipboardContent, caretPosition); // Insert the clipboard content at the caret position
-        System.out.println("Text pasted: " + clipboardContent); // Print confirmation to the console
+        this.undo.store();
+
+       this.engine.pasteClipboard();
+
+       if (this.recorder.getStarted()) {
+     	   
+     	   recorder.save(this);
+        }
     }
+
+	@Override
+	public Memento getMemento() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setMemento(Memento m) {
+		// TODO Auto-generated method stub
+		
+	}
+
+    // Méthode pour annuler l'action (Undo)
+    
 }

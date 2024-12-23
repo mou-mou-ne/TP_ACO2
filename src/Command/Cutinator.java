@@ -1,51 +1,74 @@
 package Command;
 
-import javax.swing.JTextArea;
-import selection.Selection_implement;
+import Recorder.recorderImpl;
+import engine.Engine_implementation;
+import mementomoris.Memento;
+import undoManagerinator.UndoManagerinatorImpl;
 
 /**
- * The Cutinator class implements the Command_interface and defines the action of cutting selected text
- * from a JTextArea and storing it in the clipboard.
- * This command is typically used to remove selected text from a text area and save it to the clipboard for potential pasting.
+ * La classe Cutinator implémente l'interface Command_interface et définit l'action de couper
+ * du texte sélectionné et de le stocker dans le presse-papiers.
+ * Cette commande est généralement utilisée pour supprimer le texte sélectionné et le sauvegarder
+ * dans le presse-papiers pour un collage ultérieur.
  */
-public class Cutinator implements Command_interface {
+public class Cutinator implements CommandOriginator {
 
-    private JTextArea textArea;
-    private Selection_implement selection;
+    private Engine_implementation engine;
+    private recorderImpl recorder;
+    private UndoManagerinatorImpl undo;
 
     /**
-     * Constructs a new Cutinator with the specified text area and selection object.
-     * @param textArea the JTextArea from which the selected text will be cut
-     * @param selection the Selection_implement object used to manage the clipboard
+     * Constructeur de la commande Cutinator.
+     *
+     * @param engine   l'implémentation du moteur pour effectuer la coupe
+     * @param recorder l'enregistreur pour sauvegarder la commande
+     * @param undo     le gestionnaire des annulations
      */
-    public Cutinator(JTextArea textArea, Selection_implement selection) {
-        this.textArea = textArea;
-        this.selection = selection;
+    public Cutinator(Engine_implementation engine, recorderImpl recorder, UndoManagerinatorImpl undo) {
+        this.engine = engine;
+        this.recorder = recorder;
+        this.undo = undo;
     }
 
     /**
-     * This method retrieves the selection start and end positions from the JTextArea,
-     * validates the selection, removes the selected text, and then stores the removed text in the clipboard.
+     * Cette méthode récupère les positions de début et de fin de la sélection, valide la sélection,
+     * supprime le texte sélectionné, puis stocke le texte supprimé dans le presse-papiers.
      * 
-     * @throws IllegalArgumentException if the selection is invalid or out of bounds
+     * @throws IllegalArgumentException si la sélection est invalide ou hors des limites du texte
      */
     @Override
     public void execute() {
-        int start = textArea.getSelectionStart(); // Retrieve the start position of the selection
-        int end = textArea.getSelectionEnd(); // Retrieve the end position of the selection
-
-        // If the selection is empty, do nothing and return
-        if (start == end) {
-            return;  // No action for empty selection
+        if (engine.getSelection().getBeginIndex() < 0 || engine.getSelection().getEndIndex() > engine.getBufferContents().length() || engine.getSelection().getBeginIndex() > engine.getSelection().getEndIndex()) {
+            throw new IllegalArgumentException("Invalid selection range");
         }
+        this.undo.store();
 
-        // Check if the selection is valid
-        if (start >= 0 && end <= textArea.getText().length() && start < end) {
-            String selectedText = textArea.getText().substring(start, end); // Get the selected text
-            textArea.replaceRange("", start, end); // Remove the selected text from the text area
-            selection.setClipboard(selectedText); // Save the selected text to the clipboard
-        } else {
-            throw new IllegalArgumentException("Sélection invalide."); // Invalid selection exception
+        this.engine.cutSelectedText();
+
+        if (this.recorder.getStarted()) {
+            recorder.save(this);
         }
+    }
+
+    /**
+     * Retourne un memento représentant l'état actuel.
+     * 
+     * @return toujours null, car cette commande ne nécessite pas de memento
+     */
+    @Override
+    public Memento getMemento() {
+        return null;
+    }
+
+    /**
+     * Restaure l'état de la commande à partir d'un memento.
+     * 
+     * <p>Non implémenté pour cette commande.</p>
+     *
+     * @param m le memento à restaurer
+     */
+    @Override
+    public void setMemento(Memento m) {
+        // Non implémenté
     }
 }

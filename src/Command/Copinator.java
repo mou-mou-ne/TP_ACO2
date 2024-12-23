@@ -1,50 +1,78 @@
 package Command;
 
-import javax.swing.JTextArea;
-import selection.Selection;
+import Recorder.recorder;
 import engine.Engine_implementation;
+import mementomoris.Memento;
+import undoManagerinator.UndoManagerinatorImpl;
 
 /**
- * The Copinator class implements the Command_interface and defines the action of copying selected text
- * from a {@link JTextArea} to the clipboard and updating the selection indices.
- * This command is typically used to copy text from a text area and save it to the clipboard for future pasting.
+ * Commande permettant de copier du texte sélectionné à l'aide du moteur.
+ * Cette commande prend en charge la gestion de l'annulation (Undo) 
+ * et peut être enregistrée pour une utilisation ultérieure.
  */
-public class Copinator implements Command_interface {
+public class Copinator implements CommandOriginator {
 
     private Engine_implementation engine;
-    private JTextArea textArea;
-    private Selection selection;
+    private recorder recorder;
+    private UndoManagerinatorImpl undo;
 
     /**
-     * Constructs a new Copinator with the specified engine, text area, and selection object.
-     * 
-     * @param engine the {@link Engine_implementation} used to manage clipboard content // 
-     * @param textArea the {@link JTextArea} from which the selected text will be copied
-     * @param selection the {@link Selection} object used to manage the selection indices
+     * Constructeur de la commande Copinator.
+     *
+     * @param engine   l'implémentation du moteur pour effectuer la copie
+     * @param recorder l'enregistreur pour sauvegarder la commande
+     * @param undo     le gestionnaire des annulations
+     * @throws IllegalArgumentException si l'un des arguments est null
      */
-    public Copinator(Engine_implementation engine, JTextArea textArea, Selection selection) {
+    public Copinator(Engine_implementation engine, recorder recorder, UndoManagerinatorImpl undo) {
+        if (engine == null || recorder == null || undo == null) {
+            throw new IllegalArgumentException("Arguments cannot be null");
+        }
         this.engine = engine;
-        this.textArea = textArea;
-        this.selection = selection;
+        this.recorder = recorder;
+        this.undo = undo;
     }
 
     /**
-     * <p>This method checks whether there is a valid text selection , copies the selected text to the clipboard,
-     * and updates the start and end indices of the selection in the {@link Selection} object.</p>
+     * Exécute la commande de copie.
      * 
-     * <p>If the selection is invalid (for exemple, no text is selected), the method does nothing.</p>
+     * <p>Cette méthode effectue les actions suivantes :
+     * <ul>
+     *   <li>Sauvegarde l'état actuel dans le gestionnaire d'annulations.</li>
+     *   <li>Copie le texte sélectionné dans le moteur.</li>
+     *   <li>Enregistre la commande si l'enregistreur est actif.</li>
+     * </ul>
+     * </p>
      */
     @Override
     public void execute() {
-        // Check if the selection is valid 
-        if (textArea.getSelectionStart() != textArea.getSelectionEnd()) {
-            // Copy the selected text to the clipboard
-            String selectedText = textArea.getSelectedText();
-            engine.setClipboardContents(selectedText);
+        this.undo.store();
+        this.engine.copySelectedText();
 
-            // Update the selection indices in the Selection object
-            selection.setBeginIndex(textArea.getSelectionStart());
-            selection.setEndIndex(textArea.getSelectionEnd());
+        if (this.recorder.getStarted()) {
+            recorder.save(this);
         }
+    }
+
+    /**
+     * Retourne un memento représentant l'état actuel.
+     * 
+     * @return toujours null, car cette commande ne nécessite pas de memento.
+     */
+    @Override
+    public Memento getMemento() {
+        return null;
+    }
+
+    /**
+     * Restaure l'état de la commande à partir d'un memento.
+     * 
+     * <p>Non implémenté pour cette commande.</p>
+     *
+     * @param m le memento à restaurer
+     */
+    @Override
+    public void setMemento(Memento m) {
+        // Non implémenté
     }
 }

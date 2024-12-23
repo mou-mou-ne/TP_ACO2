@@ -27,109 +27,88 @@ class CutinatorTest {
 
     @Test
     void testExecuteWithValidSelection() {
-        // Set up the engine with some text and selection
         engine.insert("Hello World");
         engine.getSelection().setBeginIndex(0);
-        engine.getSelection().setEndIndex(5); // Select "Hello"
+        engine.getSelection().setEndIndex(5);
 
-        // Perform the cut operation
         cutinator.execute();
 
-        // Assert that the clipboard contains the cut text ("Hello")
         assertEquals("Hello", engine.getClipboardContents());
-
-        // Assert that the text was removed from the buffer (the buffer should now be " World")
         assertEquals(" World", engine.getBufferContents());
-
-        // Assert that the selection is cleared after cutting
         assertEquals(0, engine.getSelection().getBeginIndex());
         assertEquals(0, engine.getSelection().getEndIndex());
     }
 
     @Test
     void testExecuteWithEmptySelection() {
-        // Set up the engine with some text and an empty selection
         engine.insert("Hello World");
         engine.getSelection().setBeginIndex(0);
-        engine.getSelection().setEndIndex(0); // Empty selection
+        engine.getSelection().setEndIndex(0);
 
-        // Perform the cut operation
         cutinator.execute();
 
-        // Assert that the clipboard is empty since no text was selected
         assertEquals("", engine.getClipboardContents());
-
-        // Assert that the buffer remains unchanged
         assertEquals("Hello World", engine.getBufferContents());
     }
 
     @Test
     void testUndoAfterCut() {
-        // Set up the engine with some text and selection
         engine.insert("Hello World");
         engine.getSelection().setBeginIndex(0);
-        engine.getSelection().setEndIndex(5); // Select "Hello"
+        engine.getSelection().setEndIndex(5);
 
-        // Perform the cut operation
         cutinator.execute();
 
-        // Assert that the clipboard contains the cut text ("Hello")
-        assertEquals("Hello", engine.getClipboardContents());
-
-        // Perform undo
         undo.undo();
 
-        // Assert that the buffer and clipboard are restored
-        assertEquals("Hello World", engine.getBufferContents()); // The buffer should be restored to its previous state
-        assertEquals("", engine.getClipboardContents()); // The clipboard should be empty after undo
+        assertEquals("Hello World", engine.getBufferContents());
+        assertEquals("", engine.getClipboardContents());
     }
 
     @Test
     void testRedoAfterCut() {
-        // Set up the engine with some text and selection
         engine.insert("Hello World");
         engine.getSelection().setBeginIndex(0);
-        engine.getSelection().setEndIndex(5); // Select "Hello"
+        engine.getSelection().setEndIndex(5);
 
-        // Perform the cut operation
         cutinator.execute();
-
-        // Perform undo
         undo.undo();
-
-        // Perform redo
         undo.redo();
 
-        // Assert that the buffer and clipboard reflect the redo operation
-        assertEquals(" World", engine.getBufferContents()); // The buffer should reflect the cut operation
-        assertEquals("Hello", engine.getClipboardContents()); // The clipboard should contain the cut text again
+        assertEquals(" World", engine.getBufferContents());
+        assertEquals("Hello", engine.getClipboardContents());
     }
 
     @Test
     void testInvalidSelectionThrowsException() {
-        // Set up the engine with some text and an invalid selection
         engine.insert("Hello World");
-        engine.getSelection().setBeginIndex(10); // Selection out of bounds
-        engine.getSelection().setEndIndex(15); // Selection out of bounds
+        engine.getSelection().setBeginIndex(10);
+        engine.getSelection().setEndIndex(15);
 
-        // Try to cut text and assert that an exception is thrown
         assertThrows(IllegalArgumentException.class, () -> cutinator.execute());
     }
 
     @Test
     void testCutAfterTextInsert() {
-        // Insert text and set selection
         engine.insert("Some text to cut");
-        engine.getSelection().setBeginIndex(5); // Select the first "text"
-        engine.getSelection().setEndIndex(9); // Select "text"
+        engine.getSelection().setBeginIndex(5);
+        engine.getSelection().setEndIndex(9);
 
-        // Perform the cut operation
         cutinator.execute();
 
-        // Assert the clipboard contains the selected text ("text")
         assertEquals("text", engine.getClipboardContents());
-
-        // Assert the buffer is updated (the selected text is removed)
         assertEquals("Some  to cut", engine.getBufferContents());
+    }
+
+    @Test
+    void testCutWithBoundarySelection() {
+        engine.insert("Boundary Test");
+        engine.getSelection().setBeginIndex(0);
+        engine.getSelection().setEndIndex(8); 
+
+        cutinator.execute();
+
+        assertEquals("Boundary", engine.getClipboardContents());
+        assertEquals(" Test", engine.getBufferContents());
     }
 }

@@ -18,40 +18,85 @@ public class InsertinatorTest {
     private Insertinator insertCommand;
     private UndoManagerinatorImpl undoer;
 
-
     @Before
     public void setUp() {
         engine = new Engine_implementation();
         invoker = new Invoker();
         undoer = new UndoManagerinatorImpl(engine);
-
         recorder = new recorderImpl();
-        insertCommand = new Insertinator(engine, invoker, recorder,undoer);
-        
+        insertCommand = new Insertinator(engine, invoker, recorder, undoer);
     }
 
     @Test
     public void testExecute() {
-        invoker.setTextToInsert("Test Text");
+        invoker.setTextToInsert("Box Box");
         insertCommand.execute();
-        // Verify the text is inserted correctly in the engine
-        assertTrue(engine.getBufferContents().contains("Test Text"));
+        
+        assertTrue(engine.getBufferContents().contains("Box Box"));
+    }
+
+    @Test
+    public void testUndoAfterExecute() {
+        invoker.setTextToInsert("Hamilton chez Ferrari");
+        insertCommand.execute();
+        
+        String bufferBeforeUndo = engine.getBufferContents();
+        assertTrue(bufferBeforeUndo.contains("Hamilton chez Ferrari"));
+
+        undoer.undo();
+        undoer.undo();
+
+        assertFalse(engine.getBufferContents().contains("Hamilton chez Ferrari"));
     }
 
     @Test
     public void testGetMemento() {
-        invoker.setTextToInsert("Test Text");
+        invoker.setTextToInsert("doofenshmirtz");
         Memento memento = insertCommand.getMemento();
+        
         assertNotNull(memento);
-        // Verify memento contains correct text to insert
-        assertEquals("Test Text", ((InsertMemento) memento).getTextToInsert());
+        assertEquals("doofenshmirtz", ((InsertMemento) memento).getTextToInsert());
     }
 
     @Test
     public void testSetMemento() {
-        invoker.setTextToInsert("Test Text");
+        invoker.setTextToInsert("Un phantome ornitorinx ?");
         Memento memento = insertCommand.getMemento();
+        
         insertCommand.setMemento(memento);
-        assertEquals("Test Text", invoker.getTextToInsert());
+        
+        assertEquals("Un phantome ornitorinx ?", invoker.getTextToInsert());
+    }
+
+    @Test
+    public void testRecorderInteraction() {
+        invoker.setTextToInsert("Peery le phantome ornitorinx ?");
+        insertCommand.execute();
+        
+        assertTrue(recorder.getList().size() > 0);
+    }
+
+    @Test
+    public void testEmptyTextInsertion() {
+        invoker.setTextToInsert("");
+        insertCommand.execute();
+        
+        assertEquals( "", engine.getBufferContents());
+    }
+
+    @Test
+    public void testBufferContentsAfterMultipleInserts() {
+        invoker.setTextToInsert("Perryyyy");
+        insertCommand.execute();
+        
+        String bufferAfterFirstInsert = engine.getBufferContents();
+        assertTrue(bufferAfterFirstInsert.contains("Perryyyy"));
+        
+        invoker.setTextToInsert("l'ornithorinx");
+        insertCommand.execute();
+        
+        String bufferAfterSecondInsert = engine.getBufferContents();
+        assertTrue( bufferAfterSecondInsert.contains("l'ornithorinx"));
+        assertTrue( bufferAfterSecondInsert.contains("Perryyyy") && bufferAfterSecondInsert.contains("l'ornithorinx"));
     }
 }

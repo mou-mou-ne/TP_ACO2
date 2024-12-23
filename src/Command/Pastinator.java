@@ -50,16 +50,13 @@ public class Pastinator implements CommandOriginator {
 
 	@Override
 	public Memento getMemento() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setMemento(Memento m) {
-		// TODO Auto-generated method stub
 		
 	}
 
-    // Méthode pour annuler l'action (Undo)
     
 }

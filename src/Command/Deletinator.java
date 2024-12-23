@@ -38,7 +38,6 @@ public class Deletinator implements CommandOriginator {
      */
     @Override
     public void execute() {
-        // Vérification de la validité de la sélection
         int beginIndex = engine.getSelection().getBeginIndex();
         int endIndex = engine.getSelection().getEndIndex();
 
@@ -46,10 +45,9 @@ public class Deletinator implements CommandOriginator {
             throw new IllegalArgumentException("Invalid selection: out of bounds or empty selection.");
         }
 
-        this.undo.store(); // Enregistrer l'état actuel avant d'exécuter la commande
-        this.engine.delete(); // Effectuer l'opération de suppression
+        this.undo.store(); 
+        this.engine.delete();
 
-        // Si l'enregistreur est démarré, sauvegarder l'action
         if (this.recorder.getStarted()) {
             recorder.save(this);
         }
@@ -74,6 +72,5 @@ public class Deletinator implements CommandOriginator {
      */
     @Override
     public void setMemento(Memento m) {
-        // Non implémenté
     }
 }

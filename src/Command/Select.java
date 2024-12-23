@@ -40,13 +40,13 @@ public class Select implements CommandOriginator {
      */
     @Override
     public void execute() {
-        this.undo.store(); // Sauvegarde de l'état actuel avant d'effectuer la sélection
+    	
+        this.undo.store();
 
-        // Mise à jour des indices de sélection
         this.engine.getSelection().setBeginIndex(this.invoker.getBegin());
         this.engine.getSelection().setEndIndex(this.invoker.getEnd());
 
-        // Si l'enregistreur est activé, sauvegarde de la commande
+
         if (this.recorder.getStarted()) {
             recorder.save(this);
         }

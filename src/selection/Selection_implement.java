@@ -71,12 +71,15 @@ public class Selection_implement implements Selection {
      * @throws IllegalArgumentException if the index is out of bounds ( so if the beginIndex is negative or bigger than the buffer length)
      */
     public void setBeginIndex(int beginIndex) {
-        if (beginIndex < 0 || beginIndex > buffer.length()) {
+
+        if (beginIndex < 0 || beginIndex >buffer.length()) {
             System.out.println("taille" + buffer.length());
             System.out.println("max" + beginIndex);
             throw new IllegalArgumentException("Begin index out of bounds");
 
         }
+        
+        
         this.beginIndex = beginIndex;
     }
 
@@ -86,11 +89,12 @@ public class Selection_implement implements Selection {
      * @param endIndex the ending index of the selection
      */
     public void setEndIndex(int endIndex) {
-    	if (endIndex < 0 ) {
-            throw new IllegalArgumentException("Begin index out of bounds");
+        if (endIndex < 0 ) {
+            throw new IllegalArgumentException("End index out of bounds"); // Correction du message d'exception
         }
         this.endIndex = endIndex;
     }
+
 
     
 }

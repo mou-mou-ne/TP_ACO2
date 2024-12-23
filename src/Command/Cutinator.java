@@ -69,6 +69,5 @@ public class Cutinator implements CommandOriginator {
      */
     @Override
     public void setMemento(Memento m) {
-        // Non implémenté
     }
 }

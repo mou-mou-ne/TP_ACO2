@@ -73,6 +73,5 @@ public class Copinator implements CommandOriginator {
      */
     @Override
     public void setMemento(Memento m) {
-        // Non implémenté
     }
 }

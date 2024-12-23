@@ -23,58 +23,68 @@ class DeletinatorTest {
         recorder = new recorderImpl();
         undo = new UndoManagerinatorImpl(engine);
         deletinator = new Deletinator(engine, recorder, undo);
-        
     }
 
     @Test
     void testExecuteWithValidSelection() {
-        // Set up the engine with some text and selection
         engine.insert("Hello World");
         engine.getSelection().setBeginIndex(0);
-        engine.getSelection().setEndIndex(5); // Select "Hello"
+        engine.getSelection().setEndIndex(5); 
 
         deletinator.execute();
 
-        assertEquals(" World", engine.getBufferContents());
-
+        assertEquals(" World", engine.getBufferContents()); 
         assertEquals(0, engine.getSelection().getBeginIndex());
         assertEquals(0, engine.getSelection().getEndIndex());
     }
 
     @Test
     void testExecuteWithEmptySelection() {
-        // Set up the engine with some text
         engine.insert("Hello World");
 
-        // No selection: Begin and end indices are the same (empty selection)
         engine.getSelection().setBeginIndex(0);
         engine.getSelection().setEndIndex(0);
 
-        // Perform the delete operation
         deletinator.execute();
 
-        // Assert that no changes have been made to the buffer
         assertEquals("Hello World", engine.getBufferContents());
-
-        // Assert that the selection remains unchanged
         assertEquals(0, engine.getSelection().getBeginIndex());
         assertEquals(0, engine.getSelection().getEndIndex());
     }
 
     @Test
     void testExecuteWithOutOfBoundsSelection() {
-        // Set up the engine with some text
         engine.insert("Hello World");
 
-        // Invalid selection: End index is out of bounds
         engine.getSelection().setBeginIndex(0);
-        engine.getSelection().setEndIndex(20); // Beyond the buffer length
-
-        // Perform the delete operation and assert that an exception is thrown
-        assertThrows(IllegalArgumentException.class, () -> deletinator.execute());
+        engine.getSelection().setEndIndex(20); 
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> deletinator.execute());
+        assertEquals("Invalid selection: out of bounds or empty selection.", exception.getMessage());
     }
 
-    
-    
+    @Test
+    void testUndoAfterExecute() {
+        engine.insert("Hello World");
+        engine.getSelection().setBeginIndex(0);
+        engine.getSelection().setEndIndex(5); 
 
+        deletinator.execute(); 
+
+ 
+        assertEquals(" World", engine.getBufferContents());
+
+        undo.undo();
+        assertEquals("Hello World", engine.getBufferContents()); 
+    }
+
+    @Test
+    void testDeleteEmptyText() {
+        engine.insert("");
+        engine.getSelection().setBeginIndex(0);
+        engine.getSelection().setEndIndex(0); 
+
+        deletinator.execute(); 
+
+        assertEquals("", engine.getBufferContents());
+    }
 }

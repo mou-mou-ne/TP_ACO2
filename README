@@ -1,0 +1,16 @@
+# TP_ACO_Salma_BOUCHRA
+
+This project is part of the TP_ACO course.
+
+## How to Run
+
+1. Open the project in Eclipse.
+2. Right-click on the main class containing the `public static void main(String[] args)` method.
+3. Select `Run As` > `Java Application`.
+
+## Special Thanks
+
+Again I'd like to thank Amaya HOANG for helping me with the interface and Oumar SAVI for helping me with understanding the UML
+## Author
+
+Salma Bouchra

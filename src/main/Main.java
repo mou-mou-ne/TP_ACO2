@@ -25,7 +25,7 @@ public class Main {
         System.out.println("End Index : " + engine.getSelection().getEndIndex());
         System.out.println("Clipboard: " + engine.getClipboardContents());
         if (isRecording) {
-            System.out.println("Enregistrement en cours...");
+            System.out.println("Saving...");
         }
     }
 
@@ -35,20 +35,15 @@ public class Main {
         UndoManagerinatorImpl undoManager = new UndoManagerinatorImpl(engine);
         Invoker invoker = new Invoker();
         
-        // Utilisation d'un tableau pour isRecording afin de le rendre mutable
         final boolean[] isRecording = {false};
-        // Utilisation d'un tableau pour running afin de le rendre mutable
         final boolean[] running = {true};
 
-        // Scanner pour les entrées utilisateur
         Scanner scanner = new Scanner(System.in);
 
-        // Création d'une Map pour associer les options aux actions
         Map<Integer, Runnable> actions = new HashMap<>();
         
-        // Remplissage de la Map avec les différentes options
         actions.put(1, () -> {
-            System.out.print("Entrez le texte à insérer : ");
+            System.out.print("Type text to insert : ");
             String text = scanner.nextLine();
             invoker.setTextToInsert(text);
             Insertinator insertCommand = new Insertinator(engine, invoker, recorder, undoManager);
@@ -115,7 +110,7 @@ public class Main {
         });
 
         actions.put(42, () -> {
-            running[0] = false; // Modification de la valeur de running
+            running[0] = false; 
             System.out.println("Closing, thanks for using it");
         });
 
@@ -134,9 +129,8 @@ public class Main {
             System.out.print("What do you want to do  : ");
 
             int choice = scanner.nextInt();
-            scanner.nextLine();  // Consume the newline
+            scanner.nextLine();  
 
-            // Exécute l'action associée à l'option choisie
             if (actions.containsKey(choice)) {
                 actions.get(choice).run();
             } else {
